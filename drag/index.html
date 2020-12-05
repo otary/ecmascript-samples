@@ -10,7 +10,6 @@
     <div id="fileName"></div>
     <div id="fileSize"></div>
     <div id="fileType"></div>
-    <div id="fileLength"></div>
     <div id="fileLastModifiedDate"></div>
 </div>
 
@@ -27,9 +26,17 @@
     };
 
 
+    // 拖拽到容器上方时触发
     document.getElementById("container").ondragover = function (e) {
-          e.preventDefault();
+        document.getElementById("container").style.border = "1px dashed";
+        // e.preventDefault();
     }
+
+    // 拖拽离开容器时触发
+    document.getElementById("container").ondragleave = function (e) {
+        document.getElementById("container").style.border = "1px solid";
+    }
+
 
     /**
      *
@@ -42,27 +49,74 @@
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
 
+            // 打印文件属性
             displayFileMeta(file);
 
+            // 读取文件
+            // readAsDataURL(file);
 
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            // 读取完成后触发事件
-            reader.onload = function () {
-                const img = new Image();
-                img.src = reader.result;
-            }
+            readAsText(file);
+
         }
     }
 
     /**
-     * 显示文件属性
+     * 打印拖拽的文件属性
      * @param file
      */
     function displayFileMeta(file) {
         document.getElementById("fileName").innerHTML = "fileName: " + file.name;
         document.getElementById("fileSize").innerHTML = "fileSize: " + file.size;
+        document.getElementById("fileType").innerHTML = "fileType: " + file.type;
+        document.getElementById("fileLastModifiedDate").innerHTML = "lastModifiedDate: " + file.lastModifiedDate;
+    }
 
+    /**
+     * 以base64读取文件（常用图片）
+     * @param file
+     */
+    function readAsDataURL(file) {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        // 读取完成后触发事件
+        reader.onloadend = function (ev) {
+            console.log(ev.target.result);
+
+            console.log("上传完成!");
+        }
+
+        reader.onloadstart = function (ev) {
+            console.log("开始上传!");
+        }
+
+        reader.onprogress = function (pe) {
+            // ProgressEvent
+            console.log(pe);
+
+            // pe.total => 总大小
+            // pe.loaded  => 已加载的大小
+        }
+
+        reader.onerror = function (ev) {
+            console.log("上传失败!");
+        }
+
+        reader.onabort = function (ev) {
+            console.log("上传终止")
+        }
+    }
+
+    /**
+     * 读取文本
+     * @param file
+     */
+    function readAsText(file) {
+        const reader = new FileReader();
+        reader.readAsText(file);
+
+        reader.onload = function (ev) {
+            console.log(ev.target.result);
+        }
     }
 </script>
 
